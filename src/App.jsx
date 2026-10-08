@@ -1,5 +1,5 @@
-import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
-import { BrowserRouter, Link, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Component, useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import { HashRouter, Link, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import { products } from './products'
 const currencies = {
@@ -15,8 +15,55 @@ const plans = [
 ]
 
 const formatPrice = (price, currency) => {
-  const config = currencies[currency]
-  return `${config.symbol}${(price * config.rate).toLocaleString(config.locale, { minimumFractionDigits: currency === 'PLN' ? 0 : 2, maximumFractionDigits: 2 })}`
+  const config = currencies[currency] || currencies.GBP
+  const safePrice = Number(price) || 0
+  try {
+    return `${config.symbol}${(safePrice * config.rate).toLocaleString(config.locale, { minimumFractionDigits: currency === 'PLN' ? 0 : 2, maximumFractionDigits: 2 })}`
+  } catch {
+    return `${config.symbol}${(safePrice * config.rate).toFixed(2)}`
+  }
+}
+
+const safeRead = (key, fallback) => {
+  try {
+    const value = localStorage.getItem(key)
+    return value === null ? fallback : value
+  } catch {
+    return fallback
+  }
+}
+
+const safeWrite = (key, value) => {
+  try {
+    localStorage.setItem(key, value)
+  } catch {
+    /* storage blocked (private mode) — ignore so UI never crashes */
+  }
+}
+
+const safeRemove = (key) => {
+  try {
+    localStorage.removeItem(key)
+  } catch {
+    /* ignore */
+  }
+}
+
+const readCart = () => {
+  try {
+    const raw = localStorage.getItem('varzenith-cart')
+    if (!raw) return []
+    const parsed = JSON.parse(raw)
+    if (!Array.isArray(parsed)) return []
+    return parsed.filter((item) => item && typeof item.id === 'string' && Number.isFinite(Number(item.quantity)))
+  } catch {
+    try {
+      localStorage.removeItem('varzenith-cart')
+    } catch {
+      /* ignore */
+    }
+    return []
+  }
 }
 
 const HERO_HEADLINES = ['Reliable service.', 'Everyday essentials.', 'Fresh choices.', 'Easy shopping.']
@@ -86,6 +133,29 @@ function Footer() {
 function Button({ to, children, light = false, onClick }) {
   const className = light ? 'button button-light' : 'button button-dark'
   return to ? <Link to={to} className={className}>{children}<Icon name="arrow" size={17} /></Link> : <button className={className} onClick={onClick}>{children}<Icon name="arrow" size={17} /></button>
+}
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props)
+    this.state = { hasError: false }
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+
+  handleRetry = () => {
+    this.setState({ hasError: false })
+    window.location.reload()
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <section className="section not-found"><p className="eyebrow">Something went wrong</p><h1>Please <em>try again.</em></h1><p className="legal-intro">The page hit a temporary issue. Your cart is safe — just retry.</p><div className="hero-actions" style={{ justifyContent: 'center' }}><button className="button button-dark" onClick={this.handleRetry}>Retry</button><Link to="/" className="button button-light" onClick={() => this.setState({ hasError: false })}>Back to home</Link></div></section>
+    }
+    return this.props.children
+  }
 }
 
 function ProductCard({ product, currency, onAdd }) {
@@ -165,7 +235,7 @@ function Cart({ items, currency, changeQuantity, remove }) {
 
 function Contact() {
   const [sent, setSent] = useState(false)
-  return <><section className="page-hero contact-hero"><p className="eyebrow">We’re here to help</p><h1>Get in <em>touch.</em></h1><p>Have a question about our products or your order? Our team is here to help.</p></section><section className="section contact-layout"><div className="contact-info"><p className="eyebrow">Contact details</p><h2>Let’s start<br /><em>a conversation.</em></h2><div className="contact-detail"><span>Email</span><a href="mailto:contact@varzenithspzoo.com">contact@varzenithspzoo.com</a></div><div className="contact-detail"><span>Phone</span><a href="tel:+48123456789">+48 123 456 789</a></div><div className="contact-detail"><span>Based in</span><p>Poznań, Wielkopolskie<br />Poland</p></div></div><form className="contact-form" onSubmit={(e) => { e.preventDefault(); setSent(true) }}>{sent ? <div className="form-success"><span>✓</span><h3>Thank you for reaching out.</h3><p>We’ll get back to you as soon as possible.</p></div> : <><label>Full name<input required placeholder="Your name" /></label><label>Email<input required type="email" placeholder="you@example.com" /></label><label>Subject<input required placeholder="How can we help?" /></label><label>Message<textarea required rows="5" placeholder="Write your message..." /></label><button className="button button-dark" type="submit">Send message <Icon name="arrow" size={17} /></button></>}</form></section></>
+  return <><section className="page-hero contact-hero"><p className="eyebrow">We’re here to help</p><h1>Get in <em>touch.</em></h1><p>Have a question about our products or your order? Our team is here to help.</p></section><section className="section contact-layout"><div className="contact-info"><p className="eyebrow">Contact details</p><h2>Let’s start<br /><em>a conversation.</em></h2><div className="contact-detail"><span>Email</span><a href="mailto:contact@varzenithspzoo.com">contact@varzenithspzoo.com</a></div><div className="contact-detail"><span>Phone</span><a href="tel:+48123456789">+48 123 456 789</a></div><div className="contact-detail"><span>Based in</span><p>Poznań, Wielkopolskie<br />Poland</p></div></div><form className="contact-form" onSubmit={(e) => { e.preventDefault(); setSent(true) }}>{sent ? <div className="form-success"><span>✓</span><h3>Thank you for reaching out.</h3><p>We’ll get back to you as soon as possible.</p></div> : <><label>Full name<input required placeholder="Your name" /></label><label>Email<input required type="email" placeholder="you@example.com" /></label><label>Subject<input required placeholder="How can we help?" /></label><label>Message<textarea required rows="5" placeholder="Write your message..." /></label><button className="button button-dark" type="submit">Send message <Icon name="arrow" size={17} /></button></>}</form></section><section className="section contact-map-section"><div className="contact-map-heading"><div><p className="eyebrow">Find us</p><h2>Visit us in <em>Poznań.</em></h2></div><a className="text-button map-link" href="https://www.google.com/maps/search/?api=1&query=Poznan%2C%20Poland" target="_blank" rel="noreferrer">Open in Google Maps <span>↗</span></a></div><div className="contact-map"><iframe title="Map showing Poznań, Poland" src="https://www.google.com/maps?q=Poznan%2C%20Poland&output=embed" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div></section></>
 }
 
 function Checkout({ items, currency, clearCart }) {
@@ -182,15 +252,18 @@ function Legal({ terms = false }) {
 }
 
 function App() {
-  const [currency, setCurrencyState] = useState(() => localStorage.getItem('varzenith-currency') || 'GBP')
-  const [items, setItems] = useState(() => JSON.parse(localStorage.getItem('varzenith-cart') || '[]'))
-  const setCurrency = (value) => { setCurrencyState(value); localStorage.setItem('varzenith-currency', value) }
-  const onAdd = (product) => setItems((current) => { const found = current.find((item) => item.id === product.id); const next = found ? current.map((item) => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item) : [...current, { ...product, quantity: 1 }]; localStorage.setItem('varzenith-cart', JSON.stringify(next)); return next })
-  const changeQuantity = (id, amount) => setItems((current) => { const next = current.map((item) => item.id === id ? { ...item, quantity: item.quantity + amount } : item).filter((item) => item.quantity > 0); localStorage.setItem('varzenith-cart', JSON.stringify(next)); return next })
+  const [currency, setCurrencyState] = useState(() => {
+    const saved = safeRead('varzenith-currency', 'GBP')
+    return currencies[saved] ? saved : 'GBP'
+  })
+  const [items, setItems] = useState(() => readCart())
+  const setCurrency = (value) => { setCurrencyState(value); safeWrite('varzenith-currency', value) }
+  const onAdd = (product) => setItems((current) => { const found = current.find((item) => item.id === product.id); const next = found ? current.map((item) => item.id === product.id ? { ...item, quantity: (Number(item.quantity) || 0) + 1 } : item) : [...current, { ...product, quantity: 1 }]; try { safeWrite('varzenith-cart', JSON.stringify(next)) } catch { /* ignore */ } return next })
+  const changeQuantity = (id, amount) => setItems((current) => { const next = current.map((item) => item.id === id ? { ...item, quantity: (Number(item.quantity) || 0) + amount } : item).filter((item) => Number(item.quantity) > 0); try { safeWrite('varzenith-cart', JSON.stringify(next)) } catch { /* ignore */ } return next })
   const remove = (id) => changeQuantity(id, -999)
-  const clearCart = () => { setItems([]); localStorage.removeItem('varzenith-cart') }
-  const cartCount = items.reduce((sum, item) => sum + item.quantity, 0)
-  return <BrowserRouter><ScrollToTop /><Header currency={currency} setCurrency={setCurrency} cartCount={cartCount} /><main><Routes><Route path="/" element={<Home currency={currency} onAdd={onAdd} />} /><Route path="/about" element={<About />} /><Route path="/products" element={<Products currency={currency} onAdd={onAdd} />} /><Route path="/products/:id" element={<ProductDetails currency={currency} onAdd={onAdd} />} /><Route path="/cart" element={<Cart items={items} currency={currency} changeQuantity={changeQuantity} remove={remove} />} /><Route path="/checkout" element={<Checkout items={items} currency={currency} clearCart={clearCart} />} /><Route path="/contact" element={<Contact />} /><Route path="/privacy" element={<Legal />} /><Route path="/terms" element={<Legal terms />} /><Route path="*" element={<section className="section not-found"><p className="eyebrow">404</p><h1>That page took<br /><em>a wrong turn.</em></h1><Button to="/">Back to home</Button></section>} /></Routes></main><Footer /></BrowserRouter>
+  const clearCart = () => { setItems([]); safeRemove('varzenith-cart') }
+  const cartCount = items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0)
+  return <HashRouter><ErrorBoundary><ScrollToTop /><Header currency={currency} setCurrency={setCurrency} cartCount={cartCount} /><main><Routes><Route path="/" element={<Home currency={currency} onAdd={onAdd} />} /><Route path="/about" element={<About />} /><Route path="/products" element={<Products currency={currency} onAdd={onAdd} />} /><Route path="/products/:id" element={<ProductDetails currency={currency} onAdd={onAdd} />} /><Route path="/cart" element={<Cart items={items} currency={currency} changeQuantity={changeQuantity} remove={remove} />} /><Route path="/checkout" element={<Checkout items={items} currency={currency} clearCart={clearCart} />} /><Route path="/contact" element={<Contact />} /><Route path="/privacy" element={<Legal />} /><Route path="/terms" element={<Legal terms />} /><Route path="*" element={<section className="section not-found"><p className="eyebrow">404</p><h1>That page took<br /><em>a wrong turn.</em></h1><Button to="/">Back to home</Button></section>} /></Routes></main><Footer /></ErrorBoundary></HashRouter>
 }
 
 export default App
