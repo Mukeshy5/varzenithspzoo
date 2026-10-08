@@ -19,6 +19,8 @@ const formatPrice = (price, currency) => {
   return `${config.symbol}${(price * config.rate).toLocaleString(config.locale, { minimumFractionDigits: currency === 'PLN' ? 0 : 2, maximumFractionDigits: 2 })}`
 }
 
+const HERO_HEADLINES = ['Reliable service.', 'Everyday essentials.', 'Fresh choices.', 'Easy shopping.']
+
 function ScrollToTop() {
   const { pathname } = useLocation()
 
@@ -94,6 +96,9 @@ function ProductCard({ product, currency, onAdd }) {
 
 function Home({ currency, onAdd }) {
   const [heroIndex, setHeroIndex] = useState(0)
+  const [headlineIndex, setHeadlineIndex] = useState(0)
+  const [headlineText, setHeadlineText] = useState('')
+  const [isDeletingHeadline, setIsDeletingHeadline] = useState(false)
   const heroImages = products.slice(0, 5)
 
   useEffect(() => {
@@ -103,8 +108,29 @@ function Home({ currency, onAdd }) {
     return () => window.clearInterval(timer)
   }, [heroImages.length])
 
+  useEffect(() => {
+    const target = HERO_HEADLINES[headlineIndex]
+    const isComplete = headlineText === target
+    const isEmpty = headlineText.length === 0
+    const delay = isComplete && !isDeletingHeadline ? 1700 : isEmpty && isDeletingHeadline ? 350 : isDeletingHeadline ? 55 : 105
+
+    const timer = window.setTimeout(() => {
+      if (isComplete && !isDeletingHeadline) {
+        setIsDeletingHeadline(true)
+      } else if (isEmpty && isDeletingHeadline) {
+        setHeadlineIndex((current) => (current + 1) % HERO_HEADLINES.length)
+        setIsDeletingHeadline(false)
+      } else {
+        const nextLength = headlineText.length + (isDeletingHeadline ? -1 : 1)
+        setHeadlineText(target.slice(0, nextLength))
+      }
+    }, delay)
+
+    return () => window.clearTimeout(timer)
+  }, [headlineIndex, headlineText, isDeletingHeadline])
+
   const heroProduct = heroImages[heroIndex]
-  return <><section className="hero"><div className="hero-copy"><p className="eyebrow">A considered collection</p><h1>Quality products.<br /><em>Reliable service.</em><br />Easy shopping.</h1><p className="hero-lede">Discover carefully selected products from Varzenith and enjoy a simple, secure and convenient shopping experience.</p><div className="hero-actions"><Button to="/products">Shop now</Button><Button to="/about" light>Learn more</Button></div></div><div className="hero-visual"><img key={heroProduct.id} src={heroProduct.image} alt={heroProduct.name} /><div className="hero-note"><span>0{heroIndex + 1} / 05</span><p>{heroProduct.name}<br />for everyday rituals</p></div><div className="hero-dots">{heroImages.map((item, index) => <button key={item.id} className={index === heroIndex ? 'active' : ''} onClick={() => setHeroIndex(index)} aria-label={`Show hero image ${index + 1}`} />)}</div></div></section><section className="section section-benefits"><div className="section-heading"><p className="eyebrow">The Varzenith difference</p><h2>Made to feel <em>just right.</em></h2></div><div className="benefit-grid">{[['01', 'Quality products', 'Thoughtfully selected goods that bring lasting value to daily life.'], ['02', 'Reliable service', 'Clear communication, careful packing and dependable delivery.'], ['03', 'Secure shopping', 'A straightforward experience designed with your peace of mind in mind.'], ['04', 'Customer satisfaction', 'Personal, responsive support whenever you need a hand.']].map(([number, title, text]) => <div className="benefit" key={number}><span>{number}</span><h3>{title}</h3><p>{text}</p></div>)}</div></section><section className="section featured-section"><div className="section-heading heading-row"><div><p className="eyebrow">A few favourites</p><h2>Featured <em>products.</em></h2></div><Button to="/products" light>View all products</Button></div><div className="product-grid">{products.filter((p) => p.featured).slice(0, 8).map((product) => <ProductCard key={product.id} product={product} currency={currency} onAdd={onAdd} />)}</div></section><section className="split-banner"><div><p className="eyebrow">About Varzenith</p><h2>Useful things,<br /><em>beautifully chosen.</em></h2><p>We believe shopping should be clear, calm and enjoyable. Our collection brings together quality pieces with a service that puts people first.</p><Button to="/about">Our story</Button></div><img src="https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?auto=format&fit=crop&w=1200&q=85" alt="Minimal room with a wooden table and chair" /></section><section className="section plans-section"><div className="section-heading"><p className="eyebrow">Simple options</p><h2>Choose your <em>plan.</em></h2></div><div className="plans-grid">{plans.map((plan) => <div className={plan.popular ? 'plan-card popular' : 'plan-card'} key={plan.name}>{plan.popular && <span className="popular-label">Most chosen</span>}<p className="eyebrow">{plan.name}</p><h3>{formatPrice(plan.price, currency)} <small>/ month</small></h3><p>{plan.text}</p><ul>{plan.features.map((feature) => <li key={feature}><Icon name="check" size={16} />{feature}</li>)}</ul><Button to="/contact" light>Get started</Button></div>)}</div></section><section className="cta-section"><p className="eyebrow">Your next favourite is waiting</p><h2>Ready to explore?</h2><Button to="/products">Start shopping</Button></section></>
+  return <><section className="hero"><div className="hero-copy"><p className="eyebrow">A considered collection</p><h1>Quality products.<br /><em aria-live="polite">{headlineText}<span className="typing-cursor" aria-hidden="true">|</span></em><br />Easy shopping.</h1><p className="hero-lede">Discover carefully selected products from Varzenith and enjoy a simple, secure and convenient shopping experience.</p><div className="hero-actions"><Button to="/products">Shop now</Button><Button to="/about" light>Learn more</Button></div></div><div className="hero-visual"><img key={heroProduct.id} src={heroProduct.image} alt={heroProduct.name} /><div className="hero-note"><span>0{heroIndex + 1} / 05</span><p>{heroProduct.name}<br />for everyday rituals</p></div><div className="hero-dots">{heroImages.map((item, index) => <button key={item.id} className={index === heroIndex ? 'active' : ''} onClick={() => setHeroIndex(index)} aria-label={`Show hero image ${index + 1}`} />)}</div></div></section><section className="section section-benefits"><div className="section-heading"><p className="eyebrow">The Varzenith difference</p><h2>Made to feel <em>just right.</em></h2></div><div className="benefit-grid">{[['01', 'Quality products', 'Thoughtfully selected goods that bring lasting value to daily life.'], ['02', 'Reliable service', 'Clear communication, careful packing and dependable delivery.'], ['03', 'Secure shopping', 'A straightforward experience designed with your peace of mind in mind.'], ['04', 'Customer satisfaction', 'Personal, responsive support whenever you need a hand.']].map(([number, title, text]) => <div className="benefit" key={number}><span>{number}</span><h3>{title}</h3><p>{text}</p></div>)}</div></section><section className="section featured-section"><div className="section-heading heading-row"><div><p className="eyebrow">A few favourites</p><h2>Featured <em>products.</em></h2></div><Button to="/products" light>View all products</Button></div><div className="product-grid">{products.filter((p) => p.featured).slice(0, 8).map((product) => <ProductCard key={product.id} product={product} currency={currency} onAdd={onAdd} />)}</div></section><section className="split-banner"><div><p className="eyebrow">About Varzenith</p><h2>Useful things,<br /><em>beautifully chosen.</em></h2><p>We believe shopping should be clear, calm and enjoyable. Our collection brings together quality pieces with a service that puts people first.</p><Button to="/about">Our story</Button></div><img src="https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?auto=format&fit=crop&w=1200&q=85" alt="Minimal room with a wooden table and chair" /></section><section className="section plans-section"><div className="section-heading"><p className="eyebrow">Simple options</p><h2>Choose your <em>plan.</em></h2></div><div className="plans-grid">{plans.map((plan) => <div className={plan.popular ? 'plan-card popular' : 'plan-card'} key={plan.name}>{plan.popular && <span className="popular-label">Most chosen</span>}<p className="eyebrow">{plan.name}</p><h3>{formatPrice(plan.price, currency)} <small>/ month</small></h3><p>{plan.text}</p><ul>{plan.features.map((feature) => <li key={feature}><Icon name="check" size={16} />{feature}</li>)}</ul><Button to="/contact" light>Get started</Button></div>)}</div></section><section className="cta-section"><p className="eyebrow">Your next favourite is waiting</p><h2>Ready to explore?</h2><Button to="/products">Start shopping</Button></section></>
 }
 
 function About() {
