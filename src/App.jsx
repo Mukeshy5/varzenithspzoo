@@ -105,6 +105,12 @@ const Icon = ({ name, size = 20 }) => {
     star: <path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1-5.4-2.8L6.6 20l1-6.1L3.2 9.5l6.1-.9L12 3z" />,
     plus: <><path d="M12 5v14M5 12h14" /></>,
     minus: <path d="M5 12h14" />,
+    code: <><path d="m8 9-4 3 4 3" /><path d="m16 9 4 3-4 3" /><path d="m14 5-4 14" /></>,
+    mobile: <><rect x="7" y="3" width="10" height="18" rx="2" /><path d="M11 18h2" /></>,
+    building: <><path d="M4 21V5l8-3 8 3v16" /><path d="M8 8h1M15 8h1M8 12h1M15 12h1M8 16h1M15 16h1M11 21v-4h2v4" /></>,
+    database: <><ellipse cx="12" cy="5" rx="7" ry="3" /><path d="M5 5v7c0 1.7 3.1 3 7 3s7-1.3 7-3V5" /><path d="M5 12v7c0 1.7 3.1 3 7 3s7-1.3 7-3v-7" /></>,
+    wrench: <><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17a2 2 0 0 0 3 3l5.3-5.3a4 4 0 0 0 5.4-5.4l-2.4 2.4-2.8-2.8 2.2-2.6Z" /></>,
+    message: <><path d="M20 11.5a7.5 7.5 0 0 1-8 7.5 8.2 8.2 0 0 1-3.2-.7L4 20l1.7-3.8A7.2 7.2 0 0 1 4 11.5 7.5 7.5 0 0 1 12 4a7.5 7.5 0 0 1 8 7.5Z" /><path d="M8 12h.01M12 12h.01M16 12h.01" /></>,
   }
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>
 }
@@ -127,7 +133,7 @@ function Header({ currency, setCurrency, cartCount }) {
 }
 
 function Footer() {
-  return <footer className="footer"><div className="footer-grid"><div><Link to="/" className="brand footer-brand"><span className="brand-mark">V</span><span>VARZENITH</span></Link><p>Quality products and reliable service.</p></div><div><h4>Explore</h4><Link to="/products">Shop</Link><Link to="/about">About us</Link><Link to="/contact">Contact</Link></div><div><h4>Support</h4><Link to="/privacy">Privacy policy</Link><Link to="/terms">Terms of service</Link><Link to="/cart">Your cart</Link></div><div><h4>Stay connected</h4><p>New arrivals, considered living and more.</p><div className="socials"><a href="#instagram">Instagram</a><a href="#linkedin">LinkedIn</a></div></div></div><div className="footer-bottom"><span>© 2026 Varzenith. All rights reserved.</span><span>Made for everyday living.</span></div></footer>
+  return <footer className="footer"><div className="footer-grid"><div><Link to="/" className="brand footer-brand"><span className="brand-mark">V</span><span>VARZENITH</span></Link><p>Quality products and reliable service.</p></div><div><h4>Explore</h4><Link to="/products">Shop</Link><Link to="/about">About us</Link><Link to="/contact">Contact</Link><Link to="/developer" className="footer-developer-link">Developer <span>↗</span></Link></div><div><h4>Support</h4><Link to="/privacy">Privacy policy</Link><Link to="/terms">Terms of service</Link><Link to="/cart">Your cart</Link></div><div><h4>Stay connected</h4><p>New arrivals, considered living and more.</p><div className="socials"><a href="#instagram">Instagram</a><a href="#linkedin">LinkedIn</a></div></div></div><div className="footer-bottom"><span>© 2026 Varzenith. All rights reserved.</span><span>Made for everyday living.</span></div></footer>
 }
 
 function Button({ to, children, light = false, onClick }) {
@@ -238,6 +244,57 @@ function Contact() {
   return <><section className="page-hero contact-hero"><p className="eyebrow">We’re here to help</p><h1>Get in <em>touch.</em></h1><p>Have a question about our products or your order? Our team is here to help.</p></section><section className="section contact-layout"><div className="contact-info"><p className="eyebrow">Contact details</p><h2>Let’s start<br /><em>a conversation.</em></h2><div className="contact-detail"><span>Email</span><a href="mailto:contact@varzenithspzoo.com">contact@varzenithspzoo.com</a></div><div className="contact-detail"><span>Phone</span><a href="tel:+48123456789">+48 123 456 789</a></div><div className="contact-detail"><span>Based in</span><p>Poznań, Wielkopolskie<br />Poland</p></div></div><form className="contact-form" onSubmit={(e) => { e.preventDefault(); setSent(true) }}>{sent ? <div className="form-success"><span>✓</span><h3>Thank you for reaching out.</h3><p>We’ll get back to you as soon as possible.</p></div> : <><label>Full name<input required placeholder="Your name" /></label><label>Email<input required type="email" placeholder="you@example.com" /></label><label>Subject<input required placeholder="How can we help?" /></label><label>Message<textarea required rows="5" placeholder="Write your message..." /></label><button className="button button-dark" type="submit">Send message <Icon name="arrow" size={17} /></button></>}</form></section><section className="section contact-map-section"><div className="contact-map-heading"><div><p className="eyebrow">Find us</p><h2>Visit us in <em>Poznań.</em></h2></div><a className="text-button map-link" href="https://www.google.com/maps/search/?api=1&query=Poznan%2C%20Poland" target="_blank" rel="noreferrer">Open in Google Maps <span>↗</span></a></div><div className="contact-map"><iframe title="Map showing Poznań, Poland" src="https://www.google.com/maps?q=Poznan%2C%20Poland&output=embed" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div></section></>
 }
 
+const developerServices = [
+  ['code', 'Website Development', 'Business, company, portfolio, landing page, and custom websites.'],
+  ['code', 'Web Application Development', 'Dynamic web applications, admin dashboards, and management systems.'],
+  ['mobile', 'Mobile App Development', 'Customized mobile applications shaped around project requirements.'],
+  ['building', 'Hospital Management Software', 'Hospital panels, patient registration, billing, and staff management modules.'],
+  ['building', 'School & Coaching Websites', 'Professional education websites with enquiries, courses, and contact forms.'],
+  ['wrench', 'Custom Software Development', 'Tailor-made software based on your business workflow and requirements.'],
+  ['wrench', 'Website Redesign & Maintenance', 'Improvements, bug fixes, performance optimization, and ongoing maintenance.'],
+  ['database', 'API & Database Integration', 'Secure backend development, API integration, and reliable database connectivity.'],
+]
+
+const developerBenefits = [
+  'Fast and timely project delivery.',
+  'Fully customized solutions according to client requirements.',
+  'Modern, responsive, mobile-friendly designs.',
+  'User-friendly interfaces and smooth navigation.',
+  'Scalable frontend and backend architecture.',
+  'Database integration and reliable data management.',
+  'Performance optimization and bug fixing.',
+  'Clear communication and project requirement discussions.',
+  'Post-delivery support and maintenance options.',
+  "Solutions designed around the client's budget and business goals.",
+]
+
+function DeveloperProfile() {
+  useEffect(() => {
+    const previousTitle = document.title
+    document.title = 'Developed By Mr. Mukesh Yadav | Software, App & Website Developer'
+    return () => { document.title = previousTitle }
+  }, [])
+
+  const whatsappUrl = 'https://wa.me/918052344204?text=Hello%20Mukesh%20Yadav%2C%20I%20want%20to%20discuss%20a%20website%2C%20mobile%20app%2C%20or%20custom%20software%20development%20project.'
+  return <div className="developer-page">
+    <section className="developer-hero">
+      <div className="developer-hero-copy">
+        <p className="eyebrow">Developed by</p>
+        <h1>Mr. Mukesh <em>Yadav.</em></h1>
+        <p className="developer-title">Software Developer <span>·</span> App Developer <span>·</span> Website Developer</p>
+        <p className="developer-lede">Modern, professional, and user-friendly digital solutions built around the way your business works.</p>
+        <div className="hero-actions"><a className="button button-dark" href={whatsappUrl} target="_blank" rel="noreferrer">Contact on WhatsApp <Icon name="message" size={17} /></a><a className="button button-light" href="mailto:my8052344204@gmail.com?subject=Project%20Development%20Enquiry">Send an Email <Icon name="arrow" size={17} /></a></div>
+      </div>
+      <div className="developer-hero-card"><span className="developer-monogram">MY</span><p>Building dependable digital experiences for businesses, startups, hospitals, schools, and organizations.</p><a href="tel:+918052344204">+91 8052344204</a></div>
+    </section>
+    <section className="section developer-about"><div><p className="eyebrow">About me</p><h2>Technology that<br /><em>serves your goals.</em></h2></div><div className="developer-about-copy"><p>I am a Software Developer, App Developer, and Website Developer focused on creating modern, professional, responsive, and user-friendly digital solutions for businesses, startups, hospitals, schools, coaching institutes, and other organizations.</p><p>I develop customized software and websites according to each client's business requirements, helping businesses improve their online presence, streamline their workflows, and manage their operations efficiently.</p><div className="developer-contact-row"><a href="mailto:my8052344204@gmail.com">my8052344204@gmail.com</a><a href="tel:+918052344204">+91 8052344204</a></div></div></section>
+    <section className="section developer-services"><div className="section-heading"><p className="eyebrow">What I offer</p><h2>Services for your<br /><em>next project.</em></h2></div><div className="developer-service-grid">{developerServices.map(([icon, title, description]) => <article className="developer-service-card" key={title}><span className="developer-service-icon"><Icon name={icon} size={24} /></span><h3>{title}</h3><p>{description}</p></article>)}</div></section>
+    <section className="section developer-benefits"><div className="section-heading"><p className="eyebrow">Why choose me?</p><h2>A practical, thoughtful<br /><em>partnership.</em></h2></div><div className="developer-benefit-grid">{developerBenefits.map((benefit, index) => <div className="developer-benefit" key={benefit}><span>0{index + 1}</span><p>{benefit}</p></div>)}</div></section>
+    <section className="developer-cta"><p className="eyebrow">Let's build together</p><h2>Have a Project <em>in Mind?</em></h2><p>Looking for a professional website, mobile application, or customized software for your business? Let's discuss your requirements and build a solution that fits your needs.</p><div className="hero-actions"><a className="button button-dark" href="#developer-contact">Discuss Your Project <Icon name="arrow" size={17} /></a><a className="button button-light" href={whatsappUrl} target="_blank" rel="noreferrer">Contact on WhatsApp</a><a className="button button-light" href="mailto:my8052344204@gmail.com?subject=Project%20Development%20Enquiry">Send an Email</a></div></section>
+    <div id="developer-contact" className="developer-contact-strip"><span>Available for thoughtful digital projects.</span><a href="mailto:my8052344204@gmail.com">my8052344204@gmail.com</a><a href="tel:+918052344204">Call +91 8052344204</a></div>
+  </div>
+}
+
 function Checkout({ items, currency, clearCart }) {
   const [placed, setPlaced] = useState(false)
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
@@ -263,7 +320,7 @@ function App() {
   const remove = (id) => changeQuantity(id, -999)
   const clearCart = () => { setItems([]); safeRemove('varzenith-cart') }
   const cartCount = items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0)
-  return <HashRouter><ErrorBoundary><ScrollToTop /><Header currency={currency} setCurrency={setCurrency} cartCount={cartCount} /><main><Routes><Route path="/" element={<Home currency={currency} onAdd={onAdd} />} /><Route path="/about" element={<About />} /><Route path="/products" element={<Products currency={currency} onAdd={onAdd} />} /><Route path="/products/:id" element={<ProductDetails currency={currency} onAdd={onAdd} />} /><Route path="/cart" element={<Cart items={items} currency={currency} changeQuantity={changeQuantity} remove={remove} />} /><Route path="/checkout" element={<Checkout items={items} currency={currency} clearCart={clearCart} />} /><Route path="/contact" element={<Contact />} /><Route path="/privacy" element={<Legal />} /><Route path="/terms" element={<Legal terms />} /><Route path="*" element={<section className="section not-found"><p className="eyebrow">404</p><h1>That page took<br /><em>a wrong turn.</em></h1><Button to="/">Back to home</Button></section>} /></Routes></main><Footer /></ErrorBoundary></HashRouter>
+  return <HashRouter><ErrorBoundary><ScrollToTop /><Header currency={currency} setCurrency={setCurrency} cartCount={cartCount} /><main><Routes><Route path="/" element={<Home currency={currency} onAdd={onAdd} />} /><Route path="/about" element={<About />} /><Route path="/products" element={<Products currency={currency} onAdd={onAdd} />} /><Route path="/products/:id" element={<ProductDetails currency={currency} onAdd={onAdd} />} /><Route path="/cart" element={<Cart items={items} currency={currency} changeQuantity={changeQuantity} remove={remove} />} /><Route path="/checkout" element={<Checkout items={items} currency={currency} clearCart={clearCart} />} /><Route path="/contact" element={<Contact />} /><Route path="/developer" element={<DeveloperProfile />} /><Route path="/privacy" element={<Legal />} /><Route path="/terms" element={<Legal terms />} /><Route path="*" element={<section className="section not-found"><p className="eyebrow">404</p><h1>That page took<br /><em>a wrong turn.</em></h1><Button to="/">Back to home</Button></section>} /></Routes></main><Footer /></ErrorBoundary></HashRouter>
 }
 
 export default App
